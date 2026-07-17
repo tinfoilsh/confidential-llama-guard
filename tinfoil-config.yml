@@ -1,5 +1,5 @@
-k. cvm-version: 0.10.4
-cpus: 8
+cvm-version: 0.10.4
+cpus: 16
 memory: 8192
 gpus: 0
 
