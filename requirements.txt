@@ -1,0 +1,7 @@
+# CPU-only torch installed separately in Dockerfile (from PyTorch CPU index,
+# not PyPI which serves the 2GB+ CUDA wheel by default on Linux).
+transformers==5.13.1
+protobuf>=4.0.0
+huggingface_hub>=0.25.0
+fastapi==0.138.2
+uvicorn[standard]==0.49.0

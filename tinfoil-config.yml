@@ -1,0 +1,71 @@
+cvm-version: 0.10.4
+cpus: 16
+memory: 8192
+gpus: 0
+
+models:
+  - name: "llama-prompt-guard-2-86m"
+    repo: "meta-llama/Llama-Prompt-Guard-2-86M@a8ded8e697ce7c355e395a0df51f94adb4a2fd27"
+    mpk: "360495f8a4ea2567a4e006463802ea9ffc836492f9e69377c838e9dbbe87a68a_1131679744_abf2a692-e823-51fa-ae7c-98e6c9527484"
+
+networks:
+  replicas: {}
+
+containers:
+  - name: "router"
+    image: "ghcr.io/tinfoilsh/confidential-llama-guard@sha256:0000000000000000000000000000000000000000000000000000000000000000" # placeholder - populated during release
+    restart: always
+    env:
+      - LISTEN_ADDR: ":8080"
+      - REPLICA_URLS: "http://llama-pg2-1:8001,http://llama-pg2-2:8001"
+    networks: ["replicas"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 1m
+
+  - name: "llama-pg2-1"
+    image: "ghcr.io/tinfoilsh/confidential-llama-guard-worker@sha256:0000000000000000000000000000000000000000000000000000000000000000" # placeholder - populated during release
+    restart: always
+    env:
+      - PG2_MODEL_PATH: "/tinfoil/mpk/mpk-360495f8a4ea2567a4e006463802ea9ffc836492f9e69377c838e9dbbe87a68a"
+      - NUM_THREADS: "4"
+      - MAX_CONCURRENCY: "4"
+    tmpfs:
+      /tmp: size=512m,mode=1777,exec
+      /root: size=2g,mode=0700,exec
+    command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
+    networks: ["replicas"]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 2m
+
+  - name: "llama-pg2-2"
+    image: "ghcr.io/tinfoilsh/confidential-llama-guard-worker@sha256:0000000000000000000000000000000000000000000000000000000000000000" # placeholder - populated during release
+    restart: always
+    env:
+      - PG2_MODEL_PATH: "/tinfoil/mpk/mpk-360495f8a4ea2567a4e006463802ea9ffc836492f9e69377c838e9dbbe87a68a"
+      - NUM_THREADS: "4"
+      - MAX_CONCURRENCY: "4"
+    tmpfs:
+      /tmp: size=512m,mode=1777,exec
+      /root: size=2g,mode=0700,exec
+    command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
+    networks: ["replicas"]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 2m
+
+shim:
+  upstream-port: 8080
+  authenticated: false
+  paths:
+    - /classify
+    - /classify-all
+    - /health
+    - /models
