@@ -27,6 +27,8 @@ logging.basicConfig(level=logging.INFO)
 models: dict[str, Any] = {}
 semaphores: dict[str, asyncio.Semaphore] = {}
 
+MAX_TOKENS = 512
+
 
 def load_models() -> None:
     n_threads = int(os.environ.get("NUM_THREADS", str(os.cpu_count() or 1)))
@@ -96,7 +98,14 @@ def _classify_llama_pg2(text: str) -> dict:
     entry = models["llama-pg2"]
     tokenizer = entry["tokenizer"]
     model = entry["model"]
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+    inputs = tokenizer(text, return_tensors="pt", truncation=False)
+    token_count = inputs["input_ids"].shape[1]
+    if token_count > MAX_TOKENS:
+        raise HTTPException(
+            422,
+            f"Input is {token_count} tokens, exceeds the {MAX_TOKENS}-token limit. "
+            f"Chunk the input into segments of {MAX_TOKENS} tokens or fewer.",
+        )
     with torch.no_grad():
         logits = model(**inputs).logits
     scores = torch.softmax(logits, dim=-1)
