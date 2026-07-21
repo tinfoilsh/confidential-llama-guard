@@ -13,7 +13,7 @@ networks:
 
 containers:
   - name: "router"
-    image: "ghcr.io/tinfoilsh/confidential-llama-guard@sha256:0000000000000000000000000000000000000000000000000000000000000000" # placeholder - populated during release
+    image: "ghcr.io/tinfoilsh/confidential-llama-guard@sha256:2aea14b0a230c3abdd6a624010dfb61719d33fcf6a5c52c041c587b1872c3231" # v0.0.7
     restart: always
     env:
       - LISTEN_ADDR: ":8080"
@@ -26,7 +26,7 @@ containers:
       start_period: 1m
 
   - name: "llama-pg2-1"
-    image: "ghcr.io/tinfoilsh/confidential-llama-guard-worker@sha256:0000000000000000000000000000000000000000000000000000000000000000" # placeholder - populated during release
+    image: "ghcr.io/tinfoilsh/confidential-llama-guard-worker@sha256:d7eed11b1282cd0d7817361be03f8161f0444c379ca9caed058163ce8409608d" # v0.0.7
     restart: always
     env:
       - PG2_MODEL_PATH: "/tinfoil/mpk/mpk-360495f8a4ea2567a4e006463802ea9ffc836492f9e69377c838e9dbbe87a68a"
@@ -44,7 +44,7 @@ containers:
       start_period: 2m
 
   - name: "llama-pg2-2"
-    image: "ghcr.io/tinfoilsh/confidential-llama-guard-worker@sha256:0000000000000000000000000000000000000000000000000000000000000000" # placeholder - populated during release
+    image: "ghcr.io/tinfoilsh/confidential-llama-guard-worker@sha256:d7eed11b1282cd0d7817361be03f8161f0444c379ca9caed058163ce8409608d" # v0.0.7
     restart: always
     env:
       - PG2_MODEL_PATH: "/tinfoil/mpk/mpk-360495f8a4ea2567a4e006463802ea9ffc836492f9e69377c838e9dbbe87a68a"
