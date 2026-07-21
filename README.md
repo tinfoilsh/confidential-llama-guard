@@ -51,6 +51,11 @@ the full benchmark.
 The `model` field is optional (defaults to `"llama-pg2"`) for backward
 compatibility with the multi-model `confidential-cpu-safeguards` API.
 
+Inputs exceeding **512 tokens** are rejected with `422 Unprocessable Entity`.
+The model's context window is 512 tokens (DeBERTa-v2
+`max_position_embeddings`); chunk longer inputs into segments of 512 tokens or
+fewer and classify each.
+
 ### `POST /classify-all`
 
 Runs llama-pg2 on the input. Returns the same result as `/classify` but
