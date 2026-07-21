@@ -1,6 +1,6 @@
 cvm-version: 0.10.4
 cpus: 16
-memory: 8192
+memory: 65536 # should be 8192, bumped to match platform attestation
 gpus: 0
 
 models:
